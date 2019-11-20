@@ -5,7 +5,7 @@ _https://github.com/kjdev/php-ext-jq_
 
 install this package via composer:
 
-`composer require sobernt/JqObject`
+`composer require sobernt/jq-object`
 
 **Usage**
 
