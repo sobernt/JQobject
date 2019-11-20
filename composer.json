@@ -1,0 +1,28 @@
+{
+  "name": "sobernt/JqObject",
+  "type": "project",
+  "version": "1.0.0",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "SoberNT",
+      "email": "sobernt@yandex.ru",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": "^7.2",
+    "ext-json": "*",
+    "ext-jq": "*"
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "preferred-install": "dist",
+    "sort-packages": true
+  },
+  "autoload": {
+    "psr-4": {
+      "sobernt\\JqObject\\": "src/"
+    }
+  }
+}
