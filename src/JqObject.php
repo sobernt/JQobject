@@ -120,12 +120,12 @@ class JqObject implements JsonSerializable
         if ($this->isPrimitiveChild($result)) {
             $this->cache[$name] = $this->getPrimitive($result);
         } else
-        if ($this->isArray($result)) {
-            $result = $this->jq->filter(".$name");
-            $this->cache[$name] = $this->arrayChild($result);
-        } else {
-            $this->cache[$name] = $this->getChildFromAssoc($result);
-        }
+            if ($this->isArray($result)) {
+                $result = $this->jq->filter(".$name");
+                $this->cache[$name] = $this->arrayChild($result);
+            } else {
+                $this->cache[$name] = $this->getChildFromAssoc($result);
+            }
         return $this->cache[$name];
     }
 
@@ -143,9 +143,13 @@ class JqObject implements JsonSerializable
     {
         foreach ($data as $key=>$value){
             if(is_array($value)){
-                $source = $this->jq->filter(".$key",JQ::RAW);
-                if(!$source) throw new InvalidArgumentException();
-                $this->cache[$key] = $this->getChildFromAssoc($source,$value);
+                if($this->isAssoc($value)) {
+                    $source = $this->jq->filter(".$key",Jq::RAW);
+                    if (!$source) {
+                        throw new InvalidArgumentException("");
+                    }
+                    $this->cache[$key] = $this->getChildFromAssoc($source, $value);
+                }
             } else{
                 $this->cache[$key] = $this->getPrimitive($value);
             }
@@ -241,12 +245,12 @@ class JqObject implements JsonSerializable
             if(is_array($serialized_value)){
                 $serialize[$serialized_key] = $this->serializeArray($serialized_value);
             } else
-            if(is_object($serialized_value)){
-                $serialize[$serialized_key] = $serialize[$serialized_key]->as_array();
-            } else
-            if(is_string($serialized_value)){
-                $serialize[$serialized_key] = $this->format($serialized_value);
-            }
+                if(is_object($serialized_value)){
+                    $serialize[$serialized_key] = $serialize[$serialized_key]->as_array();
+                } else
+                    if(is_string($serialized_value)){
+                        $serialize[$serialized_key] = $this->format($serialized_value);
+                    }
         }
         return $serialize;
     }
@@ -258,8 +262,8 @@ class JqObject implements JsonSerializable
      */
     private function isPrimitiveChild(string $json):bool
     {
-         return !$this->isArray($json)&&
-                !$this->isObject($json);
+        return !$this->isArray($json)&&
+            !$this->isObject($json);
     }
 
     /**
@@ -329,13 +333,12 @@ class JqObject implements JsonSerializable
         foreach ($array as $key=>$value){
             if(is_array($value)) {
                 if ($this->isAssoc($value)) {
-                    $result[] = $this->getChildFromAssoc(json_encode($value), $value);
+                    $result[$key] = $this->getChildFromAssoc(json_encode($value), $value);
                 } else {
-                    $result[] = $this->arrayChild($value);
+                    $result[$key] = $this->arrayChild($value);
                 }
-            }
-            else{
-                $result[]=$this->getPrimitive($value);
+            } else{
+                $result[$key]=$this->getPrimitive($value);
             }
         }
         return $result;
